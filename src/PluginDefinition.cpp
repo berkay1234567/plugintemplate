@@ -60,6 +60,7 @@ void commandMenuInit()
     //            );
     setCommand(0, TEXT("Hello Notepad++"), hello, NULL, false);
     setCommand(1, TEXT("Hello (with dialog)"), helloDlg, NULL, false);
+    setCommand(2, TEXT("FORMATTER"), formatScript, NULL, false);
 }
 
 //
@@ -113,4 +114,9 @@ void hello()
 void helloDlg()
 {
     ::MessageBox(NULL, TEXT("Hello, Notepad++!"), TEXT("Notepad++ Plugin Template"), MB_OK);
+}
+
+void formatCustomScript()
+{
+    ::MessageBox(NULL, TEXT("Formatter placeholder - not implemented yet"), TEXT("MyPlugin"), MB_OK);
 }

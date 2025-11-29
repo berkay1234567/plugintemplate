@@ -17,3 +17,29 @@ vs.proj/.vs/
 *.aps
 *.zip
 *.bak
+# Visual Studio workspace
+.vs/
+
+# User-specific project files
+*.user
+*.suo
+*.vcxproj.user
+
+# IntelliSense / browsing databases
+*.VC.db
+*.VC.db*
+*.opendb
+*.db
+
+# Build outputs (optional, if not already there)
+Debug/
+Release/
+x64/
+x86/
+ipch/
+*.obj
+*.log
+*.pch
+*.pdb
+*.dll
+*.exe
