@@ -6,43 +6,24 @@ FuncItem funcItem[nbFunc];
 
 NppData nppData;
 
-//
-// Initialize your plugin data here
-// It will be called while plugin loading   
-void pluginInit(HANDLE /*hModule*/)
+void pluginInit(HANDLE)
 {
 }
 
-//
-// Here you can do the clean up, save the parameters (if any) for the next session
-//
 void pluginCleanUp()
 {
 }
 
 void commandMenuInit()
 {
-    // setCommand(int index,                      // zero based number to indicate the order of command
-    //            TCHAR *commandName,             // the command name that you want to see in plugin menu
-    //            PFUNCPLUGINCMD functionPointer, // the symbol of function (function pointer) associated with this command. The body should be defined below. See Step 4.
-    //            ShortcutKey *shortcut,          // optional. Define a shortcut to trigger this command
-    //            bool check0nInit                // optional. Make this menu item be checked visually
-    //            );
     setCommand(0, TEXT("Format Script"), formatScript, false);
 }
 
-//
-// Here you can do the clean up (especially for the shortcut)
-//
 void commandMenuCleanUp()
 {
-	// Don't forget to deallocate your shortcut here
 }
 
 
-//
-// This function help you to initialize your plugin commands
-//
 bool setCommand(size_t index, TCHAR *cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey *sk, bool check0nInit) 
 {
     if (index >= nbFunc)
@@ -63,7 +44,7 @@ bool setCommand(size_t index, TCHAR *cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey 
 //-------------------//
 HWND getCurrentScintilla()
 {
-    int which = 0; // 0 = main, 1 = secondary
+    int which = 0; 
     ::SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, 0, (LPARAM)&which);
 
     return (which == 0) ? nppData._scintillaMainHandle
@@ -92,24 +73,21 @@ std::string formatTernary(const std::string& input)
 
     auto emitIndent = [&out, &indent]()
         {
-            out.append(indent * 4, ' '); // 4 spaces per indent level
+            out.append(indent * 4, ' '); 
         };
 
     for (char c : input)
     {
         if (c == '?')
         {
-            // space before ? for readability
             out += " ?";
 
-            // go to a new line and increase indent for the following part
             out += '\n';
             ++indent;
             emitIndent();
         }
         else if (c == ':')
         {
-            // newline before : and reduce indent
             out += '\n';
             if (indent > 0)
                 --indent;
