@@ -1,32 +1,9 @@
-//this file is part of notepad++
-//Copyright (C)2022 Don HO <don.h@free.fr>
-//
-//This program is free software; you can redistribute it and/or
-//modify it under the terms of the GNU General Public License
-//as published by the Free Software Foundation; either
-//version 2 of the License, or (at your option) any later version.
-//
-//This program is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-//
-//You should have received a copy of the GNU General Public License
-//along with this program; if not, write to the Free Software
-//Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
 #include "PluginDefinition.h"
 #include "menuCmdID.h"
 #include <string>
 
-//
-// The plugin data that Notepad++ needs
-//
 FuncItem funcItem[nbFunc];
 
-//
-// The data of Notepad++ that you can use in your plugin commands
-//
 NppData nppData;
 
 //
@@ -43,16 +20,8 @@ void pluginCleanUp()
 {
 }
 
-//
-// Initialization of your plugin commands
-// You should fill your plugins commands here
 void commandMenuInit()
 {
-
-    //--------------------------------------------//
-    //-- STEP 3. CUSTOMIZE YOUR PLUGIN COMMANDS --//
-    //--------------------------------------------//
-    // with function :
     // setCommand(int index,                      // zero based number to indicate the order of command
     //            TCHAR *commandName,             // the command name that you want to see in plugin menu
     //            PFUNCPLUGINCMD functionPointer, // the symbol of function (function pointer) associated with this command. The body should be defined below. See Step 4.
@@ -116,23 +85,60 @@ std::string getAllText()
 
     return text;
 }
+std::string formatTernary(const std::string& input)
+{
+    std::string out;
+    int indent = 0;
 
-//----------------------------------------------//
-//-- STEP 4. DEFINE YOUR ASSOCIATED FUNCTIONS --//
-//----------------------------------------------//
+    auto emitIndent = [&out, &indent]()
+        {
+            out.append(indent * 4, ' '); // 4 spaces per indent level
+        };
+
+    for (char c : input)
+    {
+        if (c == '?')
+        {
+            // space before ? for readability
+            out += " ?";
+
+            // go to a new line and increase indent for the following part
+            out += '\n';
+            ++indent;
+            emitIndent();
+        }
+        else if (c == ':')
+        {
+            // newline before : and reduce indent
+            out += '\n';
+            if (indent > 0)
+                --indent;
+            emitIndent();
+            out += ": ";
+        }
+        else
+        {
+            out += c;
+        }
+    }
+
+    return out;
+}
+//---------------------------//
+//-- ASSOCIATED FUNCTIONS --//
+//-------------------------//
 void formatScript()
 {
     std::string text = getAllText();
+    std::string formatted = formatTernary(text);
 
-    // --- TEMP: show first 200 chars for testing ---
-    std::string preview = text.substr(0, 200);
+    HWND cur = getCurrentScintilla();
+    if (!cur)
+        return;
 
-    std::wstring previewW(preview.begin(), preview.end());
-    ::MessageBox(nppData._nppHandle, previewW.c_str(), L"Text Read", MB_OK);
-
-    // Later:
-    // std::string formatted = myFormatter(text);
-    // SendMessage(cur, SCI_SETTEXT, 0, (LPARAM)formatted.c_str());
+    ::SendMessage(cur, SCI_BEGINUNDOACTION, 0, 0);
+    ::SendMessage(cur, SCI_SETTEXT, 0, (LPARAM)formatted.c_str());
+    ::SendMessage(cur, SCI_ENDUNDOACTION, 0, 0);
 }
 
 
