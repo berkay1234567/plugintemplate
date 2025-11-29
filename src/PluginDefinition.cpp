@@ -116,7 +116,7 @@ void helloDlg()
     ::MessageBox(NULL, TEXT("Hello, Notepad++!"), TEXT("Notepad++ Plugin Template"), MB_OK);
 }
 
-void formatCustomScript()
+void formatScript()
 {
     ::MessageBox(NULL, TEXT("Formatter placeholder - not implemented yet"), TEXT("MyPlugin"), MB_OK);
 }
