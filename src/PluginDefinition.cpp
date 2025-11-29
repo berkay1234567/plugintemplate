@@ -17,6 +17,7 @@
 
 #include "PluginDefinition.h"
 #include "menuCmdID.h"
+#include <string>
 
 //
 // The plugin data that Notepad++ needs
@@ -58,9 +59,7 @@ void commandMenuInit()
     //            ShortcutKey *shortcut,          // optional. Define a shortcut to trigger this command
     //            bool check0nInit                // optional. Make this menu item be checked visually
     //            );
-    setCommand(0, TEXT("Hello Notepad++"), hello, NULL, false);
-    setCommand(1, TEXT("Hello (with dialog)"), helloDlg, NULL, false);
-    setCommand(2, TEXT("FORMATTER"), formatScript, NULL, false);
+    setCommand(0, TEXT("Format Script"), formatScript, false);
 }
 
 //
@@ -90,33 +89,50 @@ bool setCommand(size_t index, TCHAR *cmdName, PFUNCPLUGINCMD pFunc, ShortcutKey 
 
     return true;
 }
+//---------------------//
+//-- HELPER METHODS --//
+//-------------------//
+HWND getCurrentScintilla()
+{
+    int which = 0; // 0 = main, 1 = secondary
+    ::SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, 0, (LPARAM)&which);
+
+    return (which == 0) ? nppData._scintillaMainHandle
+        : nppData._scintillaSecondHandle;
+}
+
+std::string getAllText()
+{
+    HWND cur = getCurrentScintilla();
+    if (!cur)
+        return "";
+
+    int len = (int)::SendMessage(cur, SCI_GETTEXTLENGTH, 0, 0);
+
+    std::string text;
+    text.resize(len + 1);
+
+    ::SendMessage(cur, SCI_GETTEXT, len + 1, (LPARAM)text.data());
+
+    return text;
+}
 
 //----------------------------------------------//
 //-- STEP 4. DEFINE YOUR ASSOCIATED FUNCTIONS --//
 //----------------------------------------------//
-void hello()
-{
-    // Open a new document
-    ::SendMessage(nppData._nppHandle, NPPM_MENUCOMMAND, 0, IDM_FILE_NEW);
-
-    // Get the current scintilla
-    int which = -1;
-    ::SendMessage(nppData._nppHandle, NPPM_GETCURRENTSCINTILLA, 0, (LPARAM)&which);
-    if (which == -1)
-        return;
-    HWND curScintilla = (which == 0)?nppData._scintillaMainHandle:nppData._scintillaSecondHandle;
-
-    // Say hello now :
-    // Scintilla control has no Unicode mode, so we use (char *) here
-    ::SendMessage(curScintilla, SCI_SETTEXT, 0, (LPARAM)"Hello, Notepad++!");
-}
-
-void helloDlg()
-{
-    ::MessageBox(NULL, TEXT("Hello, Notepad++!"), TEXT("Notepad++ Plugin Template"), MB_OK);
-}
-
 void formatScript()
 {
-    ::MessageBox(NULL, TEXT("Formatter placeholder - not implemented yet"), TEXT("MyPlugin"), MB_OK);
+    std::string text = getAllText();
+
+    // --- TEMP: show first 200 chars for testing ---
+    std::string preview = text.substr(0, 200);
+
+    std::wstring previewW(preview.begin(), preview.end());
+    ::MessageBox(nppData._nppHandle, previewW.c_str(), L"Text Read", MB_OK);
+
+    // Later:
+    // std::string formatted = myFormatter(text);
+    // SendMessage(cur, SCI_SETTEXT, 0, (LPARAM)formatted.c_str());
 }
+
+
