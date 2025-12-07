@@ -1,0 +1,11 @@
+* Highlight the according if else
+
+* Add a button that clears all spaces,dents so the script is  ready for use
+
+* Add check button counting if else and paranthesis
+
+* Pressing a @C creates new tab and brings,formats the new formula 
+
+* Pressing a table number brings table columns 
+
+* When hovering or pressing a question/cover number show its name and type
