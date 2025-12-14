@@ -69,7 +69,7 @@ std::string getAllText()
 	return text;
 }
 
-std::string createMapping(const std::string& input) {
+std::vector<std::unordered_map<int,int>> createMapping(const std::string& input) {
 	std::stack<int> identifierStack;
 	std::stack<int> paranthesisStack;
 
@@ -99,6 +99,12 @@ std::string createMapping(const std::string& input) {
 		}
 		curIndex++;
 	}
+
+	std::vector<std::unordered_map<int, int>> result;
+	result.push_back(std::move(pairIdentifierMap));
+	result.push_back(std::move(pairParanthesisMap));
+
+	return result;
 }
 std::string formatTernary(const std::string& input)
 {
@@ -162,15 +168,29 @@ std::string formatTernary(const std::string& input)
 void formatScript()
 {
 	std::string text = getAllText();
-	std::string formatted = formatTernary(text);
+	auto maps = createMapping(text);
+	auto& identifierMap = maps[0];
+	auto& parenthesisMap = maps[1];
+	//std::string formatted = formatTernary(text);
 
-	HWND cur = getCurrentScintilla();
-	if (!cur)
-		return;
+	std::string msg =
+		"Identifier pairs: " + std::to_string(identifierMap.size()) + "\r\n" +
+		"Parenthesis pairs: " + std::to_string(parenthesisMap.size());
 
-	::SendMessage(cur, SCI_BEGINUNDOACTION, 0, 0);
-	::SendMessage(cur, SCI_SETTEXT, 0, (LPARAM)formatted.c_str());
-	::SendMessage(cur, SCI_ENDUNDOACTION, 0, 0);
+	MessageBoxA(
+		nppData._nppHandle,         
+		msg.c_str(),                
+		"SFSScript - Mapping Counts",
+		MB_OK | MB_ICONINFORMATION
+	);
+
+	//HWND cur = getCurrentScintilla();
+	//if (!cur)
+	//	return;
+
+	//::SendMessage(cur, SCI_BEGINUNDOACTION, 0, 0);
+	//::SendMessage(cur, SCI_SETTEXT, 0, (LPARAM)formatted.c_str());
+	//::SendMessage(cur, SCI_ENDUNDOACTION, 0, 0);
 }
 
 
